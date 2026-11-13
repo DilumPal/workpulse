@@ -16,8 +16,9 @@ public class Employee {
     @Column(name = "employee_id")
     private UUID employeeId;
 
-    @Column(name = "user_id")
-    private UUID userId;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    private User user;
 
     @Column(name = "first_name", length = 100)
     private String firstName;
