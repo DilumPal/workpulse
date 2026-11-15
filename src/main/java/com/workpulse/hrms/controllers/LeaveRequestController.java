@@ -2,6 +2,9 @@ package com.workpulse.hrms.controllers;
 
 import com.workpulse.hrms.entities.LeaveRequest;
 import com.workpulse.hrms.services.LeaveRequestService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +29,7 @@ public class LeaveRequestController {
     }
 
     @PostMapping
-    public ResponseEntity<LeaveRequest> createLeaveRequest(@RequestBody LeaveRequest leaveRequest) {
+    public ResponseEntity<LeaveRequest> createLeaveRequest(@Valid @RequestBody LeaveRequest leaveRequest) {
         LeaveRequest createdLeaveRequest = leaveRequestService.createLeaveRequest(leaveRequest);
         return new ResponseEntity<>(createdLeaveRequest, HttpStatus.CREATED);
     }

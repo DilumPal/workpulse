@@ -2,6 +2,9 @@ package com.workpulse.hrms.controllers;
 
 import com.workpulse.hrms.entities.Department;
 import com.workpulse.hrms.services.DepartmentService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +25,7 @@ public class DepartmentController {
     }
 
     @PostMapping
-    public ResponseEntity<Department> createDepartment(@RequestBody Department department) {
+    public ResponseEntity<Department> createDepartment(@Valid @RequestBody Department department) {
         Department savedDepartment = departmentService.createDepartment(department);
         return ResponseEntity.ok(savedDepartment);
     }

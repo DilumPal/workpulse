@@ -2,6 +2,9 @@ package com.workpulse.hrms.controllers;
 
 import com.workpulse.hrms.entities.Employee;
 import com.workpulse.hrms.services.EmployeeService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +28,7 @@ public class EmployeeController {
     }
 
     @PostMapping 
-    public ResponseEntity<Employee> createEmployee(@RequestBody Employee employee) {
+    public ResponseEntity<Employee> createEmployee(@Valid @RequestBody Employee employee) {
         Employee savedEmployee = employeeService.createEmployee(employee);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedEmployee);
     }

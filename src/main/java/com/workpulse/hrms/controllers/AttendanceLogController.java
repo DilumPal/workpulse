@@ -2,6 +2,9 @@ package com.workpulse.hrms.controllers;
 
 import com.workpulse.hrms.entities.AttendanceLog;
 import com.workpulse.hrms.services.AttendanceLogService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +29,7 @@ public class AttendanceLogController {
     }
 
     @PostMapping
-    public ResponseEntity<AttendanceLog> createAttendanceLog(@RequestBody AttendanceLog attendanceLog) {
+    public ResponseEntity<AttendanceLog> createAttendanceLog(@Valid @RequestBody AttendanceLog attendanceLog) {
         AttendanceLog createdLog = attendanceLogService.createAttendanceLog(attendanceLog);
         return new ResponseEntity<>(createdLog, HttpStatus.CREATED);
     }
