@@ -51,7 +51,7 @@ public class Employee {
     private BigDecimal salary;
 
     @NotBlank(message = "Employment type is required")
-    @Pattern(regexp = "^(Full time|Part time|Contract)$", message = "Must be 'Full time', 'Part time', or 'Contract'")
+    @Pattern(regexp = "^(Full time|Part time|Contractor|Intern)$", message = "Must be 'Full time', 'Part time', 'Contractor', or 'Intern'")
     @Column(name = "emp_type", columnDefinition = "employment_type")
     @ColumnTransformer(write = "?::employment_type")
     private String empType;

@@ -30,7 +30,7 @@ public class User {
     private String password;
 
     @NotBlank(message = "Role is required")
-    @Pattern(regexp = "^(ROLE_ADMIN|ROLE_EMPLOYEE)$", message = "Must be 'ROLE_ADMIN' or 'ROLE_EMPLOYEE'")
+    @Pattern(regexp = "^(Admin|HR Manager|Employee)$", message = "Must be 'Admin', 'HR Manager', or 'Employee'")
     @Column(name = "role", columnDefinition = "access_role")
     @ColumnTransformer(write = "?::access_role")
     private String role;
