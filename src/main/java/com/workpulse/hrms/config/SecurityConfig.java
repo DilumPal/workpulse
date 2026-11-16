@@ -26,30 +26,33 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll() // Keep auth open so people can log in
-                        // Employee Endpoints
-                        .requestMatchers(HttpMethod.GET, "/api/employees/**")
-                        .hasAnyAuthority("ROLE_ADMIN", "ROLE_EMPLOYEE")
-                        .requestMatchers(HttpMethod.POST, "/api/employees/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/employees/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/employees/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/error").permitAll()
+                        
+                        // Department Endpoints (Admin only)
+                        .requestMatchers("/api/departments/**").hasAuthority("ROLE_ADMIN")
+
+                        // Employee Self-Service 
+                        .requestMatchers(HttpMethod.PUT, "/api/employees/me").hasAnyAuthority("ROLE_ADMIN", "ROLE_HR_MANAGER", "ROLE_EMPLOYEE")
+
+                        // General Employee Endpoints
+                        .requestMatchers(HttpMethod.GET, "/api/employees/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_HR_MANAGER", "ROLE_EMPLOYEE")
+                        .requestMatchers(HttpMethod.POST, "/api/employees/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_HR_MANAGER")
+                        .requestMatchers(HttpMethod.PUT, "/api/employees/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_HR_MANAGER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/employees/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_HR_MANAGER")
 
                         // Leave Request Endpoints
-                        .requestMatchers(HttpMethod.GET, "/api/leave-requests/**")
-                        .hasAnyAuthority("ROLE_ADMIN", "ROLE_EMPLOYEE")
-                        .requestMatchers(HttpMethod.POST, "/api/leave-requests/**")
-                        .hasAnyAuthority("ROLE_ADMIN", "ROLE_EMPLOYEE")
-                        // Only HR admins can approve/reject/update a leave request
-                        .requestMatchers(HttpMethod.PUT, "/api/leave-requests/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/leave-requests/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_HR_MANAGER", "ROLE_EMPLOYEE")
+                        .requestMatchers(HttpMethod.POST, "/api/leave-requests/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_HR_MANAGER", "ROLE_EMPLOYEE")
+                        // Only Admins and HR Managers can approve/reject/update a leave request
+                        .requestMatchers(HttpMethod.PUT, "/api/leave-requests/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_HR_MANAGER")
 
                         // Attendance Endpoints
-                        .requestMatchers(HttpMethod.GET, "/api/attendance-logs/**")
-                        .hasAnyAuthority("ROLE_ADMIN", "ROLE_EMPLOYEE")
-                        .requestMatchers(HttpMethod.POST, "/api/attendance-logs/**")
-                        .hasAnyAuthority("ROLE_ADMIN", "ROLE_EMPLOYEE")
+                        .requestMatchers(HttpMethod.GET, "/api/attendance-logs/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_HR_MANAGER", "ROLE_EMPLOYEE")
+                        .requestMatchers(HttpMethod.POST, "/api/attendance-logs/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_HR_MANAGER", "ROLE_EMPLOYEE")
 
                         .anyRequest().authenticated())
-                // The JWT filter here
+                
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
