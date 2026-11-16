@@ -56,6 +56,11 @@ public class Employee {
     @ColumnTransformer(write = "?::employment_type")
     private String empType;
 
+    //validated if present
+    @Pattern(regexp = "^(https?://.+)?$", message = "Profile photo must be a valid HTTP or HTTPS URL")
+    @Column(name = "profile_photo_url", columnDefinition = "TEXT")
+    private String profilePhotoUrl;
+
     @NotNull(message = "Department assignment is required")
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "department_id", referencedColumnName = "department_id")
