@@ -6,9 +6,9 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Data 
 @Entity
 @Table(name = "attendance_logs")
-@Data
 public class AttendanceLog {
 
     @Id

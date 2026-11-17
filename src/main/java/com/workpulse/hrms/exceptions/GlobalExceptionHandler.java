@@ -64,4 +64,15 @@ public class GlobalExceptionHandler {
         response.put("details", details);
         return response;
     }
+
+    // Handles business logic errors (like double check-ins)
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalStateException(IllegalStateException ex) {
+        Map<String, Object> response = buildErrorResponse(
+                HttpStatus.CONFLICT, 
+                "Business Logic Conflict", 
+                ex.getMessage()
+        );
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
 }
