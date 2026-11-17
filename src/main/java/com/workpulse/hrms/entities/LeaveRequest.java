@@ -9,7 +9,6 @@ import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "leave_requests")
@@ -26,7 +25,6 @@ public class LeaveRequest {
     @JoinColumn(name = "employee_id", referencedColumnName = "employee_id")
     private Employee employee;
 
-    @NotBlank(message = "Leave type is required")
     @Column(name = "leave_type", columnDefinition = "leave_category")
     @ColumnTransformer(write = "?::leave_category")
     private String leaveType;
@@ -48,13 +46,13 @@ public class LeaveRequest {
     @Column(name = "reason", columnDefinition = "TEXT")
     private String reason;
 
-    @NotBlank(message = "Status is required")
     @Column(name = "status", columnDefinition = "leave_status")
     @ColumnTransformer(write = "?::leave_status")
     private String status;
 
-    @Column(name = "reviewed_by")
-    private UUID reviewedBy; 
+    @ManyToOne
+    @JoinColumn(name = "reviewed_by")
+    private Employee reviewedBy;
 
     @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
