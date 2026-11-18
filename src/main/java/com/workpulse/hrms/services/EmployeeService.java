@@ -85,6 +85,17 @@ public class EmployeeService {
         return convertToResponseDTO(employee);
     }
 
+    // NEW METHOD ADDED HERE
+    public EmployeeResponseDTO getEmployeeByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("User account not found"));
+
+        Employee employee = employeeRepository.findByUser(user)
+                .orElseThrow(() -> new EntityNotFoundException("Employee profile not found for this user"));
+
+        return convertToResponseDTO(employee);
+    }
+
     public List<EmployeeResponseDTO> getAllEmployees() {
         return employeeRepository.findAll().stream()
                 .map(this::convertToResponseDTO)

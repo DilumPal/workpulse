@@ -5,6 +5,9 @@ import lombok.Data;
 import java.util.UUID;
 import java.math.BigDecimal;
 import org.hibernate.annotations.ColumnTransformer;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.NotNull;
@@ -21,6 +24,7 @@ public class Employee {
     @Column(name = "employee_id")
     private UUID employeeId;
 
+    @JsonIgnore
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User user;

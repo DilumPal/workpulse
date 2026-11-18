@@ -22,27 +22,39 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
-    // Handled by SecurityConfig: Only Admins and HR Managers can reach this POST method
+    // POST: Create Employee
     @PostMapping
     public ResponseEntity<EmployeeResponseDTO> createEmployee(@Valid @RequestBody EmployeeCreateDTO createDTO) {
         EmployeeResponseDTO newEmployee = employeeService.createEmployee(createDTO);
         return new ResponseEntity<>(newEmployee, HttpStatus.CREATED);
     }
 
-    // Self-Service Update: Any authenticated user can reach this, but they can only edit their own data
-    @PutMapping("/me")
+    // NEW GET: Fetch logged-in user's profile
+    @GetMapping("/me")
+    public ResponseEntity<EmployeeResponseDTO> getMyProfile(Principal principal) {
+        String loggedInEmail = principal.getName();
+        
+        // Fetch the employee using your service based on their authenticated email
+        // Note: Make sure 'getEmployeeByEmail' exists in your EmployeeService
+        EmployeeResponseDTO profile = employeeService.getEmployeeByEmail(loggedInEmail);
+        
+        return ResponseEntity.ok(profile);
+    }
+
+    // UPDATED PUT: Self-Service Update (Accepts multipart/form-data for photo uploads)
+    @PutMapping(value = "/me", consumes = "multipart/form-data")
     public ResponseEntity<EmployeeResponseDTO> updateMyProfile(
-            @Valid @RequestBody EmployeeUpdateDTO updateDTO, 
+            @Valid @ModelAttribute EmployeeUpdateDTO updateDTO, 
             Principal principal) {
         
-        // principal.getName() automatically contains the email extracted from the JWT by your JwtAuthenticationFilter
+        // principal.getName() automatically contains the email extracted from the JWT
         String loggedInEmail = principal.getName();
         
         EmployeeResponseDTO updatedEmployee = employeeService.updateOwnProfile(loggedInEmail, updateDTO);
         return ResponseEntity.ok(updatedEmployee);
     }
 
-    // Available to all logged-in roles based on SecurityConfig
+    // GET: All Employees
     @GetMapping
     public ResponseEntity<List<EmployeeResponseDTO>> getAllEmployees() {
         return ResponseEntity.ok(employeeService.getAllEmployees());
