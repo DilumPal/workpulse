@@ -1,5 +1,6 @@
 package com.workpulse.hrms.services;
 
+import com.workpulse.hrms.dto.EmployeeAdminUpdateDTO;
 import com.workpulse.hrms.dto.EmployeeCreateDTO;
 import com.workpulse.hrms.dto.EmployeeResponseDTO;
 import com.workpulse.hrms.dto.EmployeeUpdateDTO;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -65,14 +67,12 @@ public class EmployeeService {
 
     @Transactional
     public EmployeeResponseDTO updateOwnProfile(String loggedInEmail, EmployeeUpdateDTO dto) {
-        // 1. Find the employee record linked to the logged-in JWT email
         User user = userRepository.findByEmail(loggedInEmail)
                 .orElseThrow(() -> new EntityNotFoundException("User account not found"));
                 
         Employee employee = employeeRepository.findByUser(user)
                 .orElseThrow(() -> new EntityNotFoundException("Employee profile not found for this user"));
 
-        // 2. Update only the allowed self-service fields (notice salary and role are physically missing here)
         employee.setFirstName(dto.getFirstName());
         employee.setLastName(dto.getLastName());
         employee.setPhoneNumber(dto.getPhoneNumber());
@@ -85,7 +85,54 @@ public class EmployeeService {
         return convertToResponseDTO(employee);
     }
 
-    // NEW METHOD ADDED HERE
+    @Transactional
+    public EmployeeResponseDTO updateEmployee(UUID employeeId, EmployeeAdminUpdateDTO dto, boolean isAdmin) {
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new EntityNotFoundException("Employee not found"));
+
+        Department department = departmentRepository.findById(dto.getDepartmentId())
+                .orElseThrow(() -> new EntityNotFoundException("Department not found"));
+
+        employee.setFirstName(dto.getFirstName());
+        employee.setLastName(dto.getLastName());
+        employee.setPhoneNumber(dto.getPhoneNumber());
+        employee.setJobRole(dto.getJobRole());
+        employee.setSalary(dto.getSalary());
+        employee.setEmpType(dto.getEmpType());
+        employee.setDepartment(department);
+
+        if (dto.getProfilePhotoUrl() != null) {
+            employee.setProfilePhotoUrl(dto.getProfilePhotoUrl());
+        }
+
+        if (employee.getUser() != null) {
+            User user = employee.getUser();
+            user.setEmail(dto.getEmail());
+
+            // Only Admins can change the access level
+            if (isAdmin && dto.getRole() != null && !dto.getRole().isBlank()) {
+                user.setRole(dto.getRole());
+            }
+            userRepository.save(user);
+        }
+
+        employee = employeeRepository.save(employee);
+        return convertToResponseDTO(employee);
+    }
+
+    @Transactional
+    public void deleteEmployee(UUID employeeId) {
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new EntityNotFoundException("Employee not found"));
+
+        User user = employee.getUser();
+        employeeRepository.delete(employee);
+
+        if (user != null) {
+            userRepository.delete(user);
+        }
+    }
+
     public EmployeeResponseDTO getEmployeeByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("User account not found"));
@@ -114,13 +161,11 @@ public class EmployeeService {
         dto.setEmpType(employee.getEmpType());
         dto.setProfilePhotoUrl(employee.getProfilePhotoUrl());
         
-        // Safely extract User data only if a linked User account actually exists
         if (employee.getUser() != null) {
             dto.setEmail(employee.getUser().getEmail());
             dto.setRole(employee.getUser().getRole());
         }
         
-        // Safely extract Department data only if a linked Department actually exists
         if (employee.getDepartment() != null) {
             dto.setDepartmentName(employee.getDepartment().getName());
         }
