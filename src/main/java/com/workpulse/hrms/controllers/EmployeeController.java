@@ -84,8 +84,8 @@ public class EmployeeController {
 
     // DELETE: Delete Employee (Admin & HR Manager)
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEmployee(@PathVariable UUID id) {
-        employeeService.deleteEmployee(id);
+    public ResponseEntity<Void> deleteEmployee(@PathVariable UUID id, Principal principal) {
+        employeeService.deleteEmployee(id, principal.getName());
         return ResponseEntity.noContent().build();
     }
 }

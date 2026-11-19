@@ -121,9 +121,14 @@ public class EmployeeService {
     }
 
     @Transactional
-    public void deleteEmployee(UUID employeeId) {
+    public void deleteEmployee(UUID employeeId, String loggedInEmail) {
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new EntityNotFoundException("Employee not found"));
+
+        if (employee.getUser() != null &&
+                employee.getUser().getEmail().equalsIgnoreCase(loggedInEmail)) {
+            throw new IllegalStateException("You cannot delete your own profile.");
+        }
 
         User user = employee.getUser();
         employeeRepository.delete(employee);

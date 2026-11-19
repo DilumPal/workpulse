@@ -36,7 +36,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         
-                        // Department Endpoints (Admin only)
+                        // Department Endpoints (Read for all roles; Create/Update/Delete for Admin only)
+                        .requestMatchers(HttpMethod.GET, "/api/departments", "/api/departments/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_HR_MANAGER", "ROLE_EMPLOYEE")
                         .requestMatchers("/api/departments/**").hasAuthority("ROLE_ADMIN")
 
                         // Employee Self-Service 
@@ -57,6 +58,7 @@ public class SecurityConfig {
                         // Attendance Endpoints
                         .requestMatchers(HttpMethod.GET, "/api/attendance-logs/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_HR_MANAGER", "ROLE_EMPLOYEE")
                         .requestMatchers(HttpMethod.POST, "/api/attendance-logs/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_HR_MANAGER", "ROLE_EMPLOYEE")
+                        .requestMatchers(HttpMethod.PUT, "/api/attendance-logs/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_HR_MANAGER", "ROLE_EMPLOYEE")
 
                         .anyRequest().authenticated())
                 

@@ -11,6 +11,7 @@ public class LeaveRequestResponseDTO {
     private Integer leaveId;
     private UUID employeeId;
     private String employeeName;
+    private String employeeJobRole;
     private String leaveType;
     private LocalDate startDate;
     private LocalDate endDate;

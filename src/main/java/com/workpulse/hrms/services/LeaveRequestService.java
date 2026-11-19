@@ -17,7 +17,7 @@ public class LeaveRequestService {
     private final EmployeeRepository employeeRepository;
     private final UserRepository userRepository;
 
-    public LeaveRequestService(LeaveRequestRepository leaveRequestRepository, 
+    public LeaveRequestService(LeaveRequestRepository leaveRequestRepository,
                                EmployeeRepository employeeRepository, UserRepository userRepository) {
         this.leaveRequestRepository = leaveRequestRepository;
         this.employeeRepository = employeeRepository;
@@ -45,8 +45,13 @@ public class LeaveRequestService {
     public LeaveRequestResponseDTO updateLeaveStatus(Integer leaveId, String reviewerEmail, LeaveRequestStatusUpdateDTO dto) {
         LeaveRequest request = leaveRequestRepository.findById(leaveId)
                 .orElseThrow(() -> new EntityNotFoundException("Leave request not found"));
-        
+
         Employee reviewer = getEmployeeByEmail(reviewerEmail);
+
+        if (request.getEmployee() != null &&
+                request.getEmployee().getEmployeeId().equals(reviewer.getEmployeeId())) {
+            throw new IllegalStateException("You cannot approve or reject your own leave request.");
+        }
 
         request.setStatus(dto.getStatus());
         request.setReviewedBy(reviewer);
@@ -91,6 +96,7 @@ public class LeaveRequestService {
         if (request.getEmployee() != null) {
             dto.setEmployeeId(request.getEmployee().getEmployeeId());
             dto.setEmployeeName(request.getEmployee().getFirstName() + " " + request.getEmployee().getLastName());
+            dto.setEmployeeJobRole(request.getEmployee().getJobRole());
         }
 
         if (request.getReviewedBy() != null) {
